@@ -14,24 +14,11 @@
                 <game-lobby screen="LOBBY">
                     <h2>Realtime Go</h2>
                     <div>
-                        <button onclick="this.closest('game-lobby').createGame()">
-                            Create New Game
-                        </button>
-                    </div>
-                    <div class="gameList">
-                        <!-- Current games are listed here -->
-                    </div>
-                </game-lobby>
-
-                <game-screen screen="GAME"></game-screen>
-            </screen-router>
-        </stateful-client>
-        <stateful-client>
-            <screen-router initial="LOBBY">
-                <game-lobby screen="LOBBY">
-                    <h2>Realtime Go</h2>
-                    <div>
-                        <button onclick="this.closest('game-lobby').createGame()">
+                        <!-- <button style="display: block;"
+                            onclick="closest('game-lobby').dispatchToServer(${startAction})">
+                            Start Offline Game
+                        </button> -->
+                        <button onclick="closest('game-lobby').createGame()">
                             Create New Game
                         </button>
                     </div>

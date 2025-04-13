@@ -1,5 +1,5 @@
 export const config = {
-  canvasWidth: 400, canvasHeight: 400,
+  canvasWidth: 800, canvasHeight: 800,
   width: 800, height: 800,
 
   isRealtime: true,

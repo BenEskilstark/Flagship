@@ -1,10 +1,11 @@
 
-import { mouseReducer } from "./mouseReducer.js";
-import { tickReducer } from "./tickReducer.js";
+import { mouseReducer } from "../reducers/mouseReducer.js";
+import { tickReducer } from "../reducers/tickReducer.js";
 import { config } from '../config.js';
-import { sessionReducer } from './sessionReducer.js';
-import { queueReducer } from './queueReducer.js';
-import { turnReducer } from './turnReducer.js';
+import { sessionReducer } from '../reducers/sessionReducer.js';
+import { queueReducer } from '../reducers/queueReducer.js';
+import { turnReducer } from '../reducers/turnReducer.js';
+import { keyReducer } from "../reducers/keyReducer.js";
 
 export const rootReducer = (state, action) => {
     if (state === undefined) state = initState();
@@ -22,6 +23,9 @@ export const rootReducer = (state, action) => {
         case 'LEAVE_SESSION':
         case 'START_SESSION':
             return sessionReducer(state, action);
+        case 'KEY_DOWN':
+        case 'KEY_UP':
+            return keyReducer(state, action);
         case 'MOUSE_DOWN':
         case 'MOUSE_MOVE':
         case "MOUSE_UP":

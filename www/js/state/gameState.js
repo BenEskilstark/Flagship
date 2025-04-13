@@ -1,8 +1,52 @@
 
 import { config } from '../config.js';
+import { makeShip } from './entities.js';
 
 
 export const initGameState = (players, clientID) => {
+  const red0 = {
+    ...makeShip({ x: 300, y: 100, playerID: players[0], color: "red" }),
+    id: 0,
+  };
+  const red1 = {
+    ...makeShip({
+      x: 225, y: 100, color: "red", playerID: players[0], leader: red0,
+    }),
+    id: 1,
+  };
+  const red2 = {
+    ...makeShip({
+      x: 150, y: 100, color: "red", playerID: players[0], leader: red0,
+    }),
+    id: 2,
+  };
+  const red3 = {
+    ...makeShip({
+      x: 75, y: 100, color: "red", playerID: players[0], leader: red0,
+    }),
+    id: 3,
+  };
+  red0.followers = [red1, red2, red3];
+
+
+  const blue0 = {
+    ...makeShip({ x: 500, y: 600, playerID: players[1], color: "blue" }),
+    id: 4, theta: Math.PI,
+  };
+  const blue1 = {
+    ...makeShip({ x: 575, y: 600, playerID: players[1], color: "blue", leader: blue0 }),
+    id: 5, theta: Math.PI,
+  };
+  const blue2 = {
+    ...makeShip({ x: 650, y: 600, playerID: players[1], color: "blue", leader: blue0 }),
+    id: 6, theta: Math.PI,
+  };
+  const blue3 = {
+    ...makeShip({ x: 725, y: 600, playerID: players[1], color: "blue", leader: blue0 }),
+    id: 7, theta: Math.PI,
+  };
+  blue0.followers = [blue1, blue2, blue3];
+
   return {
     /////////////
     // immutable game state
@@ -41,38 +85,10 @@ export const initGameState = (players, clientID) => {
 
     /////////////
     // global game state that must be shared
-    nextEntityId: 5,
+    nextEntityId: 10,
     entities: {
-      0: {
-        id: 0, x: 100, y: 100, speed: 1.5, color: "red", radius: 30,
-        range: 250, fireRateTicks: 40, fireCooldown: 10,
-        symbol: "🚢", isSelectable: true,
-        hp: 100, maxhp: 100,
-      },
-      1: {
-        id: 1, x: 140, y: 120, speed: 1.5, color: "red", radius: 30,
-        range: 250, fireRateTicks: 40, fireCooldown: 10,
-        symbol: "🚢", isSelectable: true,
-        hp: 100, maxhp: 100,
-      },
-      2: {
-        id: 2, x: 120, y: 170, speed: 1.5, color: "red", radius: 30,
-        range: 250, fireRateTicks: 40, fireCooldown: 10,
-        symbol: "🚢", isSelectable: true,
-        hp: 100, maxhp: 100,
-      },
-      3: {
-        id: 3, x: 200, y: 170, speed: 2, color: "red", radius: 20,
-        range: 150, fireRateTicks: 25, fireCooldown: 10,
-        symbol: "🛥️", isSelectable: true,
-        hp: 80, maxhp: 80,
-      },
-      4: {
-        id: 4, x: 600, y: 600, speed: 1.5, color: "blue", radius: 30,
-        range: 250, fireRateTicks: 40, fireCooldown: 10,
-        symbol: "🚢", isSelectable: true,
-        hp: 100, maxhp: 100,
-      },
-    },
-  };
+      0: red0, 1: red1, 2: red2, 3: red3,
+      4: blue0, 5: blue1, 6: blue2, 7: blue3,
+    }
+  }
 }

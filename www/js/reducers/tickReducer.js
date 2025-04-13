@@ -1,6 +1,7 @@
 
 import { dist, subtract, vectorTheta } from '../utils/vectors.js';
 import { normalIn } from '../utils/stochastic.js';
+import { makeBomb, makeExplosion, makeShip } from '../state/entities.js';
 
 export const tickReducer = (state, action) => {
     switch (action.type) {
@@ -28,51 +29,56 @@ const tick = (state) => {
     const entitiesToDelete = [];
     const entitiesToAdd = [];
 
-    // move entities towards their targets
+    // rotate and move entities
     for (const id in entities) {
         const entity = entities[id];
-        if (entity.target != null && dist(entity.target, entity) > entity.speed) {
-            const theta = vectorTheta(subtract(entity.target, entity));
-            entity.x += entity.speed * Math.cos(theta);
-            entity.y += entity.speed * Math.sin(theta);
-        } else if (entity.symbol == "💣") {
-            entitiesToDelete.push(entity);
-            const explosion = {
-                ticksRemaining: 10, symbol: "💥", x: entity.x, y: entity.y,
-                radius: 15, speed: 0,
-                damage: entity.damage, didDamage: false,
+
+        // turn
+        if (entity.theta == null) entity.theta = 0;
+        if (entity.thetaSpeed == null) entity.thetaSpeed = 0;
+        entity.theta = (entity.theta + entity.thetaSpeed) % (2 * Math.PI);
+
+        // move
+        entity.x += entity.speed * Math.cos(entity.theta);
+        entity.y += entity.speed * Math.sin(entity.theta);
+
+        // follow the leader
+        if (entity.actionQueue?.length > 0) {
+            for (let action of entity.actionQueue) {
+                action.ticks--;
             }
-            entitiesToAdd.push(explosion);
+            const { ticks, thetaSpeed } = entity.actionQueue[0];
+            if (ticks < 0) {
+                entity.actionQueue.shift();
+                entity.thetaSpeed = thetaSpeed;
+            }
         }
 
-        if (entity.firePos != null && dist(entity, entity.firePos) > entity.range) {
-            entity.firePos = null;
+        // bombs at target
+        if (entity.symbol == "💣" && dist(entity, entity.target) < entity.speed) {
+            entitiesToDelete.push(entity);
+            entitiesToAdd.push(makeExplosion({ x: entity.x, y: entity.y, damage: entity.damage }));
         }
     }
 
     // start firing
     for (const id in entities) {
         const entity = entities[id];
-        if (entity.firePos != null) {
-            if (entity.fireCooldown > 0) {
-                entity.fireCooldown--;
-                continue;
-            }
-            entity.fireCooldown = entity.fireRateTicks;
-            const distToTarget = dist(entity, entity.firePos);
-            const accuracy = distToTarget / 2;
-            const bomb = {
-                firerId: id, speed: 4, radius: 10,
-                // color: entity.color,
-                x: entity.x, y: entity.y, symbol: "💣",
-                target: {
-                    x: normalIn(entity.firePos.x - accuracy, entity.firePos.x + accuracy),
-                    y: normalIn(entity.firePos.y - accuracy, entity.firePos.y + accuracy),
-                },
-                damage: entity.radius,
-            };
-            entitiesToAdd.push(bomb);
+        if (entity.firePos == null) continue;
+        if (dist(entity, entity.firePos) > entity.range) continue;
+        if (entity.fireCooldown > 0) {
+            entity.fireCooldown--;
+            continue;
         }
+        entity.fireCooldown = entity.fireRateTicks;
+        const distToTarget = dist(entity, entity.firePos);
+        const accuracy = distToTarget / 2;
+        const target = {
+            x: normalIn(entity.firePos.x - accuracy, entity.firePos.x + accuracy),
+            y: normalIn(entity.firePos.y - accuracy, entity.firePos.y + accuracy),
+        };
+        entitiesToAdd.push(makeBomb({ x: entity.x, y: entity.y, target }));
+
     }
 
     // collisions 
