@@ -1,0 +1,25 @@
+<html>
+
+<head>
+    <title>Kantai Kessen</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+
+<body>
+    <script type="module" src="js/index.js"></script>
+    <div style="width: 100%; margin: auto">
+        <stateful-client>
+            <top-bar style="display: block; width: 100%; margin: 5px;"></top-bar>
+            <game-board width=800 height=800>
+                <canvas id="canvas" class="boardcanvas" width=700 height=700
+                    onmousedown="closest('game-board').canvasMouseDown(event)"
+                    onmousemove="closest('game-board').canvasMouseMove(event)"
+                    onmouseup="closest('game-board').canvasMouseUp(event)"
+                    oncontextmenu="closest('game-board').canvasRightClick(event)">
+                </canvas>
+            </game-board>
+        </stateful-client>
+    </div>
+</body>
+
+</html>
