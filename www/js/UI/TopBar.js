@@ -1,4 +1,5 @@
 import StatefulHTML from './StatefulHTML.js';
+import { config } from '../config.js';
 
 
 export default class TopBar extends StatefulHTML {
@@ -30,27 +31,36 @@ export default class TopBar extends StatefulHTML {
     }
 
     render(state) {
-        const { tickInterval, mouse } = state;
+        const { isOffline, tickInterval, mouse } = state;
+
+        let pauseButton = "";
+        if (isOffline) {
+            pauseButton = ` 
+                <button onclick="closest('top-bar').togglePause()">
+                    ${tickInterval ? "Pause" : "Play"}
+                </button>`;
+        }
 
         this.innerHTML = `
-          <button onclick="closest('top-bar').togglePause()">
-            ${tickInterval ? "Pause" : "Play"}
-          </button>
-          <button onclick="closest('top-bar').toggleClickMode()">
-            ${mouse.clickMode == "MOVE" ? "Switch to Fire Mode (F)" : "Switch to Move Mode (M)"}
-          </button>
-        `;
+          ${pauseButton}
+            <button onclick="closest('top-bar').toggleClickMode()">
+                ${mouse.clickMode == "MOVE" ? "Switch to Fire Mode (F)" : "Switch to Move Mode (M)"}
+            </button>
+            `;
     }
 
     togglePause() {
-        const { tickInterval } = this.getState();
-        if (tickInterval) {
-            this.dispatch({ type: "STOP_TICK" });
-        } else {
-            this.dispatch({
-                type: "START_TICK",
-                dispatchFn: () => this.dispatch({ type: "TICK" })
-            });
+        const { isOffline, tickInterval } = this.getState();
+
+        if (isOffline) {
+            if (tickInterval) {
+                this.dispatch({ type: "STOP_TICK" });
+            } else {
+                this.dispatch({
+                    type: "START_TICK",
+                    dispatchFn: () => this.dispatch({ type: "TICK" })
+                });
+            }
         }
     }
 

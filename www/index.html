@@ -3,21 +3,45 @@
 <head>
     <title>Kantai Kessen</title>
     <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
     <script type="module" src="js/index.js"></script>
     <div style="width: 100%; margin: auto">
         <stateful-client>
-            <top-bar style="display: block; width: 100%; margin: 5px;"></top-bar>
-            <game-board width=800 height=800>
-                <canvas id="canvas" class="boardcanvas" width=700 height=700
-                    onmousedown="closest('game-board').canvasMouseDown(event)"
-                    onmousemove="closest('game-board').canvasMouseMove(event)"
-                    onmouseup="closest('game-board').canvasMouseUp(event)"
-                    oncontextmenu="closest('game-board').canvasRightClick(event)">
-                </canvas>
-            </game-board>
+            <screen-router initial="LOBBY">
+                <game-lobby screen="LOBBY">
+                    <h2>Realtime Go</h2>
+                    <div>
+                        <button onclick="this.closest('game-lobby').createGame()">
+                            Create New Game
+                        </button>
+                    </div>
+                    <div class="gameList">
+                        <!-- Current games are listed here -->
+                    </div>
+                </game-lobby>
+
+                <game-screen screen="GAME"></game-screen>
+            </screen-router>
+        </stateful-client>
+        <stateful-client>
+            <screen-router initial="LOBBY">
+                <game-lobby screen="LOBBY">
+                    <h2>Realtime Go</h2>
+                    <div>
+                        <button onclick="this.closest('game-lobby').createGame()">
+                            Create New Game
+                        </button>
+                    </div>
+                    <div class="gameList">
+                        <!-- Current games are listed here -->
+                    </div>
+                </game-lobby>
+
+                <game-screen screen="GAME"></game-screen>
+            </screen-router>
         </stateful-client>
     </div>
 </body>

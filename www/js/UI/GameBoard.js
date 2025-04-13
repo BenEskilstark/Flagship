@@ -1,16 +1,34 @@
 import StatefulHTML from './StatefulHTML.js';
 import { convertGridPosToPixel, convertGridScalarToPixel } from '../utils/coordinates.js';
+import { config } from '../config.js';
 
 
 export default class GameBoard extends StatefulHTML {
     connectedCallback() {
         const width = parseInt(this.getAttribute("width"));
         const height = parseInt(this.getAttribute("height"));
-        this.dispatch({ width, height });
+        if (width && height) {
+            this.dispatch({ width, height });
+        }
         this.render(this.getState());
 
-        window.getState = this.getState;
-        window.dispatch = this.dispatch;
+        // window.getState = this.getState;
+        // window.dispatch = this.dispatch;
+    }
+
+    onChange(state) {
+        // handling ending your turn
+        if (this.endTurnInterval == null && state.myTurn && state.realtime) {
+            this.endTurnInterval = setTimeout(() => {
+                this.endTurnInterval = null;
+                const actions = [...this.getState().actionQueue];
+                this.dispatchToServerAndSelf({
+                    type: 'END_TURN', clientID: state.clientID, actions,
+                });
+            }, config.turnTime);
+        }
+
+        this.render(state);
     }
 
     render(state) {
@@ -93,34 +111,30 @@ export default class GameBoard extends StatefulHTML {
         }
     }
 
-    onChange(state) {
-        this.render(state);
-    }
-
     /////////////////////////////////////////////////////////////////////////////
     // Mouse Handlers
 
     canvasMouseDown(ev) {
         ev.preventDefault();
         if (ev.button !== 0) return; // Only proceed for left-click
-        this.dispatch({ type: "MOUSE_DOWN", ev });
+        this.dispatchOrQueue({ type: "MOUSE_DOWN", offsetX: ev.offsetX, offsetY: ev.offsetY });
     }
 
     canvasMouseUp(ev) {
         ev.preventDefault();
         if (ev.button !== 0) return; // Only proceed for left-click
-        this.dispatch({ type: "MOUSE_UP", ev });
+        this.dispatchOrQueue({ type: "MOUSE_UP", offsetX: ev.offsetX, offsetY: ev.offsetY });
     }
 
     canvasMouseMove(ev) {
         ev.preventDefault();
         if (this.getState().mouse.downPos == null) return;
-        this.dispatch({ type: "MOUSE_MOVE", ev });
+        this.dispatch({ type: "MOUSE_MOVE", offsetX: ev.offsetX, offsetY: ev.offsetY });
     }
 
     canvasRightClick(ev) {
         ev.preventDefault();
-        this.dispatch({ type: "RIGHT_CLICK", ev });
+        this.dispatchOrQueue({ type: "RIGHT_CLICK", offsetX: ev.offsetX, offsetY: ev.offsetY });
     }
 }
 

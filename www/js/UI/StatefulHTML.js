@@ -1,3 +1,5 @@
+import { dispatchToServer } from '../sockets.js';
+
 // Have components that are children of <stateful-client> extend this
 // class in order for them to get access to
 // this.getState, this.dispatch, etc.
@@ -14,13 +16,13 @@ export default class StatefulHTML extends HTMLElement {
   }
 
   registerState() {
-    const storeEvent = new CustomEvent('requestStore', {bubbles: true, detail: {}});
+    const storeEvent = new CustomEvent('requestStore', { bubbles: true, detail: {} });
     this.dispatchEvent(storeEvent);
     Object.assign(this, storeEvent.detail);
   }
 
   disconnectedCallback() {
-    this.unsubscribe(this.token);
+    this.unsubscribe(this.token); // make sure to call this if you override
   }
 
   onChange(state) {
@@ -28,13 +30,25 @@ export default class StatefulHTML extends HTMLElement {
   }
 
   // call these
-  // dispatchToServer(action) {
-  //   dispatchToServer(this.getState().socket, action);
-  // }
+  dispatchToServer(action) {
+    dispatchToServer(this.getState().socket, action);
+  }
 
-  // dispatchToServerAndSelf(action) {
-  //   this.dispatch(action);
-  //   dispatchToServer(this.getState().socket, action);
-  // }
+  dispatchToServerAndSelf(action) {
+    this.dispatch(action);
+    dispatchToServer(this.getState().socket, action);
+  }
+
+  // dispatches the action to self and server if it's my turn,
+  // else just queues the action to myself
+  dispatchOrQueue(action) {
+    const { myTurn, realtime } = this.getState();
+    // if (!myTurn && realtime) {
+    if (realtime) {  // always queue
+      this.dispatch({ type: 'QUEUE_ACTION', action });
+    } else {
+      this.dispatchToServerAndSelf(action);
+    }
+  }
 
 }

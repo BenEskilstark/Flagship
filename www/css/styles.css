@@ -3,12 +3,21 @@ body {
     margin: 0;
 }
 
-/* 
+game-lobby {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
 stateful-client {
     display: inline-block;
-} */
+    border: 1px solid grey;
+}
 
-/* game-board {
+/* 
+game-board {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,4 +25,4 @@ stateful-client {
     width: 500;
     height: 500;
     border: 1px solid black;
-} */
+}  */

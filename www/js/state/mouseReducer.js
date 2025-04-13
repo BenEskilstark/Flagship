@@ -13,24 +13,24 @@ export const mouseReducer = (state, action) => {
 
     switch (action.type) {
         case 'MOUSE_DOWN': {
-            const { ev } = action;
+            const { offsetX, offsetY } = action;
             const { mouse, entities } = state;
-            const { x, y } = convertPixelToGridPos(state, ev);
-            const curPos = { x: ev.offsetX, y: ev.offsetY };
+            const { x, y } = convertPixelToGridPos(state, action);
+            const curPos = { x: offsetX, y: offsetY };
 
             return { ...state, mouse: { ...mouse, downPos: { x, y }, curPos } };
         }
         case 'MOUSE_MOVE': {
-            const { ev } = action;
+            const { offsetX, offsetY } = action;
             const { mouse } = state;
-            const x = ev.offsetX;
-            const y = ev.offsetY;
+            const x = offsetX;
+            const y = offsetY;
             return {
                 ...state, mouse: { ...mouse, curPos: { x, y } }
             };
         }
         case "MOUSE_UP": {
-            const { ev } = action;
+            const { offsetX, offsetY } = action;
             const { mouse, entities } = state;
 
             // deselect all entities
@@ -41,7 +41,7 @@ export const mouseReducer = (state, action) => {
 
             // select entities in the marquee
             const fromPos = mouse.downPos;
-            const toPos = convertPixelToGridPos(state, ev);
+            const toPos = convertPixelToGridPos(state, action);
             const min = { x: Math.min(toPos.x, fromPos.x), y: Math.min(toPos.y, fromPos.y) };
             const max = { x: Math.max(toPos.x, fromPos.x), y: Math.max(toPos.y, fromPos.y) };
             for (const id in entities) {
@@ -64,9 +64,9 @@ export const mouseReducer = (state, action) => {
             };
         }
         case "RIGHT_CLICK": {
-            const { ev } = action;
+            const { offsetX, offsetY } = action;
             const { mouse, entities } = state;
-            const toPos = convertPixelToGridPos(state, ev);
+            const toPos = convertPixelToGridPos(state, { offsetX, offsetY });
             for (const id in entities) {
                 const entity = entities[id];
                 if (entity.isSelected) {
