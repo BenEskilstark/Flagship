@@ -18,10 +18,12 @@ app.use(cors())
 // make all of www available
 app.use(express.static(path.join(__dirname, '../www')));
 
+console.log("Port:", port);
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.HOSTNAME + ":" + port,
+    origin: process.env.HOSTNAME,
     // origin: "http://localhost:8000",
     methods: ["GET", "POST"],
   }
