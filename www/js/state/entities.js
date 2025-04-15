@@ -3,7 +3,7 @@ import { normalIn } from '../utils/stochastic.js';
 import { config } from '../config.js';
 
 export const makeShip = ({ x, y, playerID, color, leader }) => {
-    const speed = 1;
+    const speed = 1.5;
     return {
         x, y, playerID, color,
         speed, theta: 0, thetaSpeed: 0, maxThetaSpeed: 0.05,

@@ -102,7 +102,20 @@ const tick = (state) => {
     // destroy entities with no hp left
     for (const id in entities) {
         const entity = entities[id];
-        if (entity.maxhp && entity.hp < 0) entitiesToDelete.push(entity);
+        if (entity.maxhp && entity.hp < 0) {
+            entitiesToDelete.push(entity);
+            // delete from followers list
+            if (entity.leader) {
+                entity.leader.followers = entity.leader.followers.filter(e => e.id != id);
+            }
+            // re-assign leader
+            if (entity.isSelected && entity.followers?.length > 0) {
+                const next = entity.followers.shift();
+                next.followers = entity.followers;
+                next.followers.forEach(e => e.leader = next);
+                next.isSelected = true;
+            }
+        }
     }
 
     // destroy short-lived entities
